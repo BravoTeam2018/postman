@@ -1,0 +1,202 @@
+{
+	"info": {
+		"_postman_id": "de935345-c223-4c90-b026-f492493fb3ab",
+		"name": "clonevalidation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "request",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ae55d166-2141-4340-a500-0271383d9f29",
+						"exec": [
+							"pm.variables.set(\"secondsBefore\", data.secondsBeforeNow);",
+							"pm.variables.set(\"cardId\",data.cardId);",
+							"pm.variables.set(\"panelId\",data.panelId);",
+							"pm.variables.set(\"isSetupPrevious\",data.isSetupPrevious);",
+							"pm.variables.set(\"expectValidEvent\",data.expectValidEvent);",
+							"",
+							"if ( pm.variables.get(\"isSetupPrevious\") === \"TRUE\") {",
+							"",
+							"    var moment = require('moment');",
+							"    pm.variables.set(\"current_timestamp\", moment().toISOString());",
+							"    var prevTime = new Date( moment().subtract(data.secondsBeforeNow, 'seconds').toISOString() );",
+							"    ",
+							"    pm.variables.set(\"timeStamp\", \"&timeStamp=\" + prevTime.getTime() );",
+							"    pm.variables.set(\"type\",\"addprev\");",
+							"",
+							"    console.log(\" START -- setup data ----- \");",
+							"",
+							"} else {",
+							"",
+							"    pm.variables.set(\"timeStamp\", \"\");",
+							"    pm.variables.set(\"type\",\"request\");",
+							"    ",
+							"    console.log(\" START -- TEST  ----- \");",
+							"}",
+							"",
+							"console.log(\"secondsBeforeNow=\"+pm.variables.get(\"secondsBefore\"));",
+							"console.log(\"cardId=\"+pm.variables.get(\"cardId\"));",
+							"console.log(\"panelId=\"+pm.variables.get(\"panelId\"));",
+							"console.log(\"isSetupPrevious=\"+pm.variables.get(\"isSetupPrevious\"));",
+							"console.log(\"expectValidEvent=\"+pm.variables.get(\"expectValidEvent\"));",
+							"console.log(\"timeStamp=\"+pm.variables.get(\"timeStamp\"));",
+							"console.log(\"type=\"+pm.variables.get(\"type\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e448aca3-a2b0-467f-8f7f-8bffc706abad",
+						"exec": [
+							"console.log(\"data.isSetupPrevious=\"+data.isSetupPrevious);",
+							"",
+							"var jsonData = pm.response.json();",
+							"console.log(\"pm.response.json()=\"+JSON.stringify(jsonData));",
+							"",
+							"if ( data.isSetupPrevious === \"TRUE\") {",
+							"    ",
+							"    console.log(\"skipping as there is no need to test reponse for when isSetupPrevious=TRUE\");",
+							"",
+							"} else {",
+							"    ",
+							"    pm.test(\"Response time is less than 500ms\", function () {",
+							"        pm.expect(pm.response.responseTime).to.be.below(500);",
+							"    });",
+							"    ",
+							"    pm.test(\"Status code is 200\", function () {",
+							"        pm.response.to.have.status(200);",
+							"    });",
+							"    ",
+							"    pm.test(\"Check for valid event\", function () {",
+							"",
+							"        var whattoExpect = (pm.variables.get(\"expectValidEvent\") === 'TRUE') ? true  : false ;",
+							"        ",
+							"        console.log(\"whattoExpect=\"+whattoExpect);",
+							"        ",
+							"        pm.expect(jsonData.validEvent).to.eql(whattoExpect);",
+							"    });",
+							"}",
+							"",
+							"console.log(\"  ---------- END \");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://{{host}}/api/panels/{{type}}?panelId={{panelId}}&cardId={{cardId}}&allowed=true{{timeStamp}}",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"panels",
+						"{{type}}"
+					],
+					"query": [
+						{
+							"key": "panelId",
+							"value": "{{panelId}}"
+						},
+						{
+							"key": "cardId",
+							"value": "{{cardId}}"
+						},
+						{
+							"key": "allowed",
+							"value": "true{{timeStamp}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "836db499-c4df-41eb-8b45-c72aa7c668b2",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "d3b06192-a15e-4a76-ab0a-cc8aa0672e68",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "e842bc72-efa2-4001-9d4e-67ebfefe7f25",
+			"key": "panelId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "f67044a9-4113-4ef4-9c10-b8e17a9f923c",
+			"key": "cardId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "a77e634b-4b1e-4abf-8e65-cc0e0dd62489",
+			"key": "secondsBefore",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "8efa0b30-2f08-4298-9921-a47aaab96ca0",
+			"key": "isSetupPrevious",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "6b63e182-323d-4453-8ec7-574745bc0f2e",
+			"key": "expectValidEvent",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "86612f87-79e1-460e-9421-076683fe1fbf",
+			"key": "timeStamp",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "c5b72f22-4f0f-46d7-bc6e-5e0dc7b77593",
+			"key": "type",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "172c54c0-e815-4701-91d3-717e121d676d",
+			"key": "current_timestamp",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
